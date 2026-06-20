@@ -76,10 +76,10 @@ export default function Tool() {
           ))}</div>
         </div>
 
-        <Slider label="CSS" unit=" mm" value={op.cssMm} min={4} max={200} step={1} onChange={(v) => patch({ cssMm: v })} />
+        <Slider label="CSS" unit=" mm" value={op.cssMm} min={4} max={260} step={1} onChange={(v) => patch({ cssMm: v })} />
         <Slider label={es ? 'Carrera' : 'Throw'} unit=" mm" value={op.throwMm} min={8} max={50} step={1} onChange={(v) => patch({ throwMm: v })} />
-        <Slider label={es ? 'Velocidad' : 'Speed'} unit=" rpm" value={op.speedRpm} min={150} max={600} step={5} onChange={(v) => patch({ speedRpm: v })} />
-        <Slider label="Feed x63" unit=" mm" value={op.feedX63Mm} min={20} max={500} step={5} onChange={(v) => patch({ feedX63Mm: v })} />
+        <Slider label={es ? 'Velocidad' : 'Speed'} unit=" rpm" value={op.speedRpm} min={100} max={600} step={5} onChange={(v) => patch({ speedRpm: v })} />
+        <Slider label="Feed x63" unit=" mm" value={op.feedX63Mm} min={20} max={800} step={5} onChange={(v) => patch({ feedX63Mm: v })} />
         <Slider label={es ? 'Feed m' : 'Feed m'} unit="" value={op.feedM} min={0.6} max={2.2} step={0.05} onChange={(v) => patch({ feedM: v })} />
         <Slider label={es ? 'Dureza A·b' : 'Ore A·b'} unit="" value={op.oreAxb} min={25} max={120} step={1} onChange={(v) => patch({ oreAxb: v })} />
 
