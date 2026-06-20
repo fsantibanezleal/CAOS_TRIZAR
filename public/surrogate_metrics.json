@@ -1,0 +1,48 @@
+{
+  "nTrain": 4198,
+  "nTest": 1499,
+  "perOutput": {
+    "p80": {
+      "r2": 0.9975,
+      "mape_pct": 2.651
+    },
+    "p50": {
+      "r2": 0.9971,
+      "mape_pct": 3.252
+    },
+    "p20": {
+      "r2": 0.9931,
+      "mape_pct": 5.309
+    },
+    "pass1": {
+      "r2": 0.9916,
+      "mape_pct": 9.42
+    },
+    "pass4": {
+      "r2": 0.9942,
+      "mape_pct": 5.789
+    },
+    "pass8": {
+      "r2": 0.9961,
+      "mape_pct": 4.848
+    },
+    "pass16": {
+      "r2": 0.9973,
+      "mape_pct": 3.314
+    },
+    "pass32": {
+      "r2": 0.9961,
+      "mape_pct": 2.375
+    },
+    "tph": {
+      "r2": 0.9974,
+      "mape_pct": 1.997
+    },
+    "kW": {
+      "r2": 0.9913,
+      "mape_pct": 4.592
+    }
+  },
+  "p80MonotoneVsCss": true,
+  "note": "Surrogate emulates the calibrated cheap physics engine, NOT a real plant. Held-out = an independent 2nd LHS draw (seed 67890), not a row-split."
+}

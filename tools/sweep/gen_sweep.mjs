@@ -50,8 +50,12 @@ function lhs(n, d, rnd) {
   return Array.from({ length: n }, (_, i) => cols.map((c) => c[i]));
 }
 
-const N_PER_MACHINE = 1400;
-const rnd = mulberry32(12345);
+// argv: [seed] [outName] [nPerMachine] — defaults generate the TRAIN set; an independent seed/name gives the
+// held-out TEST set (a second LHS draw, NOT a row-split — a row-split leaks the stratified design).
+const SEED = Number(process.argv[2] ?? 12345);
+const OUT_NAME = process.argv[3] ?? 'cz-sweep';
+const N_PER_MACHINE = Number(process.argv[4] ?? 1400);
+const rnd = mulberry32(SEED);
 const rows = [];
 let kept = 0, invalid = 0;
 
@@ -84,9 +88,9 @@ for (const machine of MACHINES) {
   }
 }
 
-writeFileSync(resolve(OUT, 'cz-sweep.jsonl'), rows.map((r) => JSON.stringify(r)).join('\n') + '\n');
-const meta = { nTotal: rows.length, nValid: kept, nInvalid: invalid, nPerMachine: N_PER_MACHINE, machines: MACHINES, seed: 12345,
+writeFileSync(resolve(OUT, `${OUT_NAME}.jsonl`), rows.map((r) => JSON.stringify(r)).join('\n') + '\n');
+const meta = { nTotal: rows.length, nValid: kept, nInvalid: invalid, nPerMachine: N_PER_MACHINE, machines: MACHINES, seed: SEED,
   inputs: ['machine(one-hot×3)', 'cssMm', 'throwMm', 'speedRpm', 'feedX63Mm', 'feedM', 'oreAxb'],
   outputs: ['p80', 'p50', 'p20', 'pass1', 'pass4', 'pass8', 'pass16', 'pass32', 'tph', 'kW'] };
-writeFileSync(resolve(OUT, 'cz-sweep-meta.json'), JSON.stringify(meta, null, 2));
-console.log(`wrote cz-sweep.jsonl: ${rows.length} points (${kept} valid, ${invalid} invalid) across ${MACHINES.length} machines`);
+writeFileSync(resolve(OUT, `${OUT_NAME}-meta.json`), JSON.stringify(meta, null, 2));
+console.log(`wrote ${OUT_NAME}.jsonl: ${rows.length} points (${kept} valid, ${invalid} invalid) across ${MACHINES.length} machines (seed ${SEED})`);
