@@ -23,8 +23,8 @@ export default function Experiments() {
       <h3>{es ? 'Barridos controlados' : 'Controlled sweeps'}</h3>
       <ul>
         <li>{es ? <><b>CSS → P80.</b> Cerrar el CSS afina el producto monótonamente (verificado en los tests del motor). La pestaña de mapa de operación muestra P80 sobre velocidad×CSS.</> : <><b>CSS → P80.</b> Closing the CSS makes the product monotonically finer (asserted in the engine tests). The operating-map tab shows P80 over speed×CSS.</>}</li>
-        <li>{es ? <><b>Velocidad → capacidad.</b> La capacidad sube hasta un óptimo y luego cae (la joroba de Evertsson) — C03 y C08 cruzan deliberadamente al lado descendente.</> : <><b>Speed → capacity.</b> Capacity rises to an optimum then falls (the Evertsson hump) — C03 and C08 deliberately cross to the falling side.</>}</li>
-        <li>{es ? <><b>Controles.</b> C12 (paso directo, CSS ≥ F80) debe mostrar reducción ≈1; C13 (CSS &gt; tope de feed) debe marcarse inválido, nunca un gráfico bonito.</> : <><b>Controls.</b> C12 (pass-through, CSS ≥ F80) must show reduction ≈1; C13 (CSS &gt; feed top) must be flagged invalid, never a pretty plot.</>}</li>
+        <li>{es ? <><b>Velocidad → capacidad.</b> La capacidad sube hasta un óptimo y luego cae (la joroba de Evertsson) — el caso S03 (sobre-velocidad) cruza deliberadamente al lado descendente.</> : <><b>Speed → capacity.</b> Capacity rises to an optimum then falls (the Evertsson hump) — case S03 (over-speed) deliberately crosses to the falling side.</>}</li>
+        <li>{es ? <><b>Controles.</b> CP1 (paso directo, CSS ≥ F80) debe mostrar reducción ≈1; CI1 (CSS &gt; tope de feed) debe marcarse inválido, nunca un gráfico bonito.</> : <><b>Controls.</b> CP1 (pass-through, CSS ≥ F80) must show reduction ≈1; CI1 (CSS &gt; feed top) must be flagged invalid, never a pretty plot.</>}</li>
       </ul>
 
       <h3>{es ? 'Protocolo a prueba de fugas' : 'Leakage-safe protocol'}</h3>

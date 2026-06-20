@@ -27,9 +27,10 @@ async function run(model: string, inputName: string, outputName: string, flat: F
   return job;
 }
 
-/** Surrogate forward: standardized 9-vec → standardized 10-vec (caller inverse-transforms via scaler.json). */
-export function runSurrogate(x9: Float32Array): Promise<Float32Array> {
-  return run('surrogate.onnx', 'x', 'y', x9, [1, 9]);
+/** Surrogate forward: standardized 11-vec (5 machine one-hot + 6 continuous) → standardized 10-vec
+ *  (caller inverse-transforms via scaler.json). */
+export function runSurrogate(x11: Float32Array): Promise<Float32Array> {
+  return run('surrogate.onnx', 'x', 'y', x11, [1, 11]);
 }
 
 /** Autoencoder forward: standardized 14-vec → reconstruction 14-vec (caller computes MSE = anomaly score). */

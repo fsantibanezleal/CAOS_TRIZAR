@@ -27,15 +27,19 @@ function mulberry32(a) {
   };
 }
 
-const MACHINES = ['cone-sec', 'cone-tert', 'jaw'];
-// per-machine continuous ranges [min,max]: css, throw, speed, feedX63, feedM, oreAxb
+const MACHINES = ['cone-sec', 'cone-tert', 'jaw', 'cone-short-head', 'gyratory'];
+// per-machine continuous ranges [min,max]: css, throw, speed, feedX63, feedM, oreAxb. Each machine is sampled
+// only over ITS realistic operating envelope (a gyratory never runs a 6 mm CSS; a short-head never a 200 mm one)
+// so the surrogate learns each machine's true regime, not a shared rectangle.
 const RANGE = {
-  'cone-sec':  { css: [6, 90], throwMm: [16, 44], speed: [180, 560], x63: [40, 200], m: [0.7, 2.0], axb: [30, 110] },
-  'cone-tert': { css: [4, 22], throwMm: [10, 26], speed: [220, 600], x63: [15, 55], m: [0.9, 2.0], axb: [30, 110] },
-  'jaw':       { css: [50, 160], throwMm: [24, 50], speed: [180, 380], x63: [180, 500], m: [0.7, 1.6], axb: [35, 110] },
+  'cone-sec':         { css: [6, 90], throwMm: [16, 44], speed: [180, 560], x63: [40, 200], m: [0.7, 2.0], axb: [30, 110] },
+  'cone-tert':        { css: [4, 22], throwMm: [10, 26], speed: [220, 600], x63: [15, 55], m: [0.9, 2.0], axb: [30, 110] },
+  'jaw':              { css: [50, 160], throwMm: [24, 50], speed: [180, 380], x63: [180, 500], m: [0.7, 1.6], axb: [35, 110] },
+  'cone-short-head':  { css: [4, 16], throwMm: [10, 22], speed: [380, 600], x63: [15, 45], m: [0.9, 2.0], axb: [30, 110] }, // tertiary short-head: finest, fastest, smallest gap
+  'gyratory':         { css: [120, 240], throwMm: [22, 40], speed: [100, 200], x63: [300, 800], m: [0.7, 1.4], axb: [30, 110] }, // primary gyratory: very wide OSS-set, slow, coarse RoM feed
 };
 // Bond work index derived from ore competence A·b (harder ore = lower A·b = higher Wi), kept consistent so power
-// tracks hardness without adding a free input dimension (surrogate stays at 6 continuous + 3 one-hot).
+// tracks hardness without adding a free input dimension (surrogate stays at 6 continuous + 5 one-hot).
 const wiOf = (axb) => Math.max(8, Math.min(20, 8 + (120 - axb) * 0.09));
 
 /** Latin-hypercube: for each of D dims, a random permutation of N stratified cells, jittered within the cell. */
@@ -90,7 +94,7 @@ for (const machine of MACHINES) {
 
 writeFileSync(resolve(OUT, `${OUT_NAME}.jsonl`), rows.map((r) => JSON.stringify(r)).join('\n') + '\n');
 const meta = { nTotal: rows.length, nValid: kept, nInvalid: invalid, nPerMachine: N_PER_MACHINE, machines: MACHINES, seed: SEED,
-  inputs: ['machine(one-hot×3)', 'cssMm', 'throwMm', 'speedRpm', 'feedX63Mm', 'feedM', 'oreAxb'],
+  inputs: ['machine(one-hot×5)', 'cssMm', 'throwMm', 'speedRpm', 'feedX63Mm', 'feedM', 'oreAxb'],
   outputs: ['p80', 'p50', 'p20', 'pass1', 'pass4', 'pass8', 'pass16', 'pass32', 'tph', 'kW'] };
 writeFileSync(resolve(OUT, `${OUT_NAME}-meta.json`), JSON.stringify(meta, null, 2));
 console.log(`wrote ${OUT_NAME}.jsonl: ${rows.length} points (${kept} valid, ${invalid} invalid) across ${MACHINES.length} machines (seed ${SEED})`);

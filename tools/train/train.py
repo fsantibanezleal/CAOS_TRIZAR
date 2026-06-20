@@ -24,8 +24,10 @@ SWEEP = os.path.abspath(os.path.join(HERE, "..", "sweep"))
 OUT = os.path.abspath(os.path.join(HERE, "..", "..", "public"))
 os.makedirs(OUT, exist_ok=True)
 
-MACHINES = ["cone-sec", "cone-tert", "jaw"]
+MACHINES = ["cone-sec", "cone-tert", "jaw", "cone-short-head", "gyratory"]
+NM = len(MACHINES)                                                       # one-hot width (=5)
 CONT = ["cssMm", "throwMm", "speedRpm", "feedX63Mm", "feedM", "oreAxb"]   # 6 continuous inputs (z-scored)
+NIN = NM + len(CONT)                                                     # surrogate input width (=11)
 # 10 surrogate outputs; sizes predicted in log10-space (positivity + lower MAPE over ~a decade), then z-scored.
 OUTS = ["p80", "p50", "p20", "pass1", "pass4", "pass8", "pass16", "pass32", "tph", "kW"]
 LOG_OUT = {"p80", "p50", "p20"}
@@ -39,11 +41,11 @@ def load(name):
 
 
 def enc_in(rows):
-    X = np.zeros((len(rows), 9), np.float32)
+    X = np.zeros((len(rows), NIN), np.float32)
     for i, r in enumerate(rows):
         X[i, MACHINES.index(r["machine"])] = 1.0
         for j, k in enumerate(CONT):
-            X[i, 3 + j] = r[k]
+            X[i, NM + j] = r[k]
     return X
 
 
@@ -68,7 +70,7 @@ def enc_ae(rows):
 class Surrogate(nn.Module):
     def __init__(self):
         super().__init__()
-        self.net = nn.Sequential(nn.Linear(9, 64), nn.GELU(), nn.Linear(64, 64), nn.GELU(),
+        self.net = nn.Sequential(nn.Linear(NIN, 64), nn.GELU(), nn.Linear(64, 64), nn.GELU(),
                                  nn.Linear(64, 32), nn.GELU(), nn.Linear(32, 10))
 
     def forward(self, x):
@@ -97,9 +99,9 @@ def main():
     Xtr, Ytr = enc_in(tr), enc_out(tr)
     Xte, Yte = enc_in(te), enc_out(te)
     # input z-scoring: only the 6 continuous dims (one-hot stays 0/1)
-    xmu, xsd = zstats(Xtr[:, 3:]); ymu, ysd = zstats(Ytr)
+    xmu, xsd = zstats(Xtr[:, NM:]); ymu, ysd = zstats(Ytr)
     def zin(X):
-        Z = X.copy(); Z[:, 3:] = (X[:, 3:] - xmu) / xsd; return Z
+        Z = X.copy(); Z[:, NM:] = (X[:, NM:] - xmu) / xsd; return Z
     Ztr, Zte = zin(Xtr), zin(Xte)
     Wtr = (Ytr - ymu) / ysd
 
@@ -131,9 +133,9 @@ def main():
     base = {"machine": "cone-sec", "cssMm": 16, "throwMm": 30, "speedRpm": 360, "feedX63Mm": 90, "feedM": 1.2, "oreAxb": 55}
     css_grid = [12, 20, 32, 50, 80]
     def predict_one(op):
-        x = np.zeros((1, 9), np.float32); x[0, MACHINES.index(op["machine"])] = 1
-        for j, k in enumerate(CONT): x[0, 3 + j] = op[k]
-        x[:, 3:] = (x[:, 3:] - xmu) / xsd
+        x = np.zeros((1, NIN), np.float32); x[0, MACHINES.index(op["machine"])] = 1
+        for j, k in enumerate(CONT): x[0, NM + j] = op[k]
+        x[:, NM:] = (x[:, NM:] - xmu) / xsd
         with torch.no_grad(): z = sur(torch.tensor(x)).numpy()[0]
         v = z * ysd + ymu
         return float(10 ** v[0])      # p80
@@ -161,7 +163,7 @@ def main():
     # ---- export ONNX (dynamic batch) ----
     os.environ["PYTHONIOENCODING"] = "utf-8"
     sur_path = os.path.join(OUT, "surrogate.onnx")
-    torch.onnx.export(sur, torch.zeros(2, 9), sur_path, dynamo=False, input_names=["x"], output_names=["y"],
+    torch.onnx.export(sur, torch.zeros(2, NIN), sur_path, dynamo=False, input_names=["x"], output_names=["y"],
                       dynamic_axes={"x": {0: "n"}, "y": {0: "n"}}, opset_version=17)
     ae_path = os.path.join(OUT, "psd-ae.onnx")
     torch.onnx.export(ae, torch.zeros(2, 14), ae_path, dynamo=False, input_names=["x"], output_names=["xr"],
@@ -175,7 +177,7 @@ def main():
 
     # ---- scalers + threshold + metrics (the frozen inference contract) ----
     json.dump({
-        "inputOrder": ["machine_cone-sec", "machine_cone-tert", "machine_jaw", *CONT],
+        "inputOrder": [*(f"machine_{m}" for m in MACHINES), *CONT],
         "inMean": xmu.tolist(), "inStd": xsd.tolist(),     # for the 6 continuous dims (one-hot not scaled)
         "outputOrder": OUTS, "outLog": [k in LOG_OUT for k in OUTS],
         "outMean": ymu.tolist(), "outStd": ysd.tolist(),
@@ -195,7 +197,7 @@ def main():
     with torch.no_grad(): torch_y = sur(torch.tensor(probe)).numpy()
     ort_y = sess.run(["y"], {"x": probe})[0]
     parity = float(np.max(np.abs(torch_y - ort_y)))
-    print(f"  PyTorch↔onnxruntime parity max|Δ| = {parity:.2e}")
+    print(f"  PyTorch<->onnxruntime parity max|d| = {parity:.2e}")
     assert parity < 1e-4, "ONNX parity exceeded tolerance"
 
     print("wrote surrogate.onnx, surrogate.int8.onnx, psd-ae.onnx, scaler.json, ae_scaler.json, ae_threshold.json, surrogate_metrics.json")

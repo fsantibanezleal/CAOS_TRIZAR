@@ -8,7 +8,8 @@ import { runSurrogate, runAutoencoder } from '../lib/ort';
 import { evaluate } from './engine';
 import type { Operating, CrusherResult, Machine } from './types';
 
-const MACHINES: Machine[] = ['cone-sec', 'cone-tert', 'jaw'];
+// IDENTICAL order to train.py MACHINES / scaler.json inputOrder — the one-hot index must match byte-for-byte.
+const MACHINES: Machine[] = ['cone-sec', 'cone-tert', 'jaw', 'cone-short-head', 'gyratory'];
 const CONT: (keyof Operating)[] = ['cssMm', 'throwMm', 'speedRpm', 'feedX63Mm', 'feedM', 'oreAxb'];
 const OUTS = ['p80', 'p50', 'p20', 'pass1', 'pass4', 'pass8', 'pass16', 'pass32', 'tph', 'kW'] as const;
 
@@ -38,11 +39,11 @@ export function learnedMetrics(): Metrics | null { return metrics; }
 export function aeThreshold(): number { return aeThr?.threshold_p99 ?? 0.4; }
 
 function encodeInput(op: Operating): Float32Array {
-  const x = new Float32Array(9);
+  const x = new Float32Array(MACHINES.length + CONT.length);   // 5 one-hot + 6 continuous = 11
   x[MACHINES.indexOf(op.machine)] = 1;
   for (let j = 0; j < CONT.length; j++) {
     const v = op[CONT[j]] as number;
-    x[3 + j] = (v - scaler!.inMean[j]) / scaler!.inStd[j];
+    x[MACHINES.length + j] = (v - scaler!.inMean[j]) / scaler!.inStd[j];
   }
   return x;
 }
