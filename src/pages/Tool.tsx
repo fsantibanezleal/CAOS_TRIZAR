@@ -22,6 +22,8 @@ import { DecisionPanel } from '../viz/DecisionPanel';
 const MACHINES: { id: Machine; en: string; es: string }[] = [
   { id: 'cone-sec', en: 'Cone · sec', es: 'Cono · sec' },
   { id: 'cone-tert', en: 'Cone · tert', es: 'Cono · terc' },
+  { id: 'cone-short-head', en: 'Short-head', es: 'Cabeza corta' },
+  { id: 'gyratory', en: 'Gyratory', es: 'Giratorio' },
   { id: 'jaw', en: 'Jaw', es: 'Mandíbula' },
 ];
 
