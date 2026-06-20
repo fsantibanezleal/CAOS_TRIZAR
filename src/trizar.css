@@ -1,0 +1,74 @@
+/* Trizar — app styles on top of the shared design-system tokens. The shell does NOT ship `.chip` or `.gauge`;
+   they are ported here from the validated RotorVitals/TailWatch visual language (pill chip with a filled-accent
+   active state, value-banded gauge, sticky control sidebar). Light AND dark via the shell tokens. */
+
+/* ---- validated pill chip ---- */
+.chip { background: var(--color-surface); border: 1px solid var(--color-border); color: var(--color-fg-subtle); border-radius: 999px; padding: 0.3rem 0.72rem; font-size: 0.8rem; cursor: pointer; transition: background .12s, color .12s, border-color .12s; }
+.chip:hover { color: var(--color-fg); border-color: var(--color-fg-faint); }
+.chip.on { background: var(--color-accent); color: var(--color-accent-fg); border-color: transparent; font-weight: 600; }
+.chip:disabled { opacity: .45; cursor: not-allowed; }
+
+/* ---- validated value-banded gauge ---- */
+.gauge { margin-top: 0.2rem; }
+.gauge-title { font-size: 0.78rem; color: var(--color-fg-faint); margin-bottom: 0.35rem; display: flex; justify-content: space-between; }
+.gauge-track { position: relative; height: 14px; border-radius: 7px; background: var(--color-surface-2, var(--color-surface)); overflow: hidden; border: 1px solid var(--color-border); }
+.gauge-zone { position: absolute; top: 0; height: 100%; opacity: 0.55; }
+.gauge-needle { position: absolute; top: -3px; width: 2px; height: 20px; background: var(--color-fg); transform: translateX(-1px); }
+.gauge-scale { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--color-fg-faint); margin-top: 0.2rem; }
+.gauge-scale .gauge-val { color: var(--color-fg); font-weight: 700; font-family: var(--font-mono); }
+
+/* ---- workbench layout: 320px control sidebar + reactive main ---- */
+.tz-layout { display: grid; grid-template-columns: 330px 1fr; gap: 1.5rem; align-items: start; }
+@media (max-width: 920px) { .tz-layout { grid-template-columns: 1fr; } }
+.tz-controls { display: flex; flex-direction: column; gap: 0.8rem; position: sticky; top: 0.5rem; }
+.tz-ctl { display: flex; flex-direction: column; gap: 0.28rem; font-size: 0.82rem; color: var(--color-fg-subtle); }
+.tz-ctl .range { width: 100%; }
+.tz-ctl-row { display: flex; justify-content: space-between; align-items: baseline; }
+.tz-ctl-row b { font-family: var(--font-mono); color: var(--color-fg); font-weight: 700; }
+.tz-chips { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.tz-chips .chip { padding: 0.18rem 0.6rem; font-size: 0.76rem; }
+.tz-sel { background: var(--color-surface); color: var(--color-fg); border: 1px solid var(--color-border); border-radius: 6px; padding: 0.25rem 0.4rem; font-size: 0.82rem; width: 100%; }
+.tz-main { display: flex; flex-direction: column; gap: 0.8rem; min-width: 0; }
+
+/* ---- KPI strip ---- */
+.tz-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
+@media (max-width: 560px) { .tz-kpis { grid-template-columns: repeat(2, 1fr); } }
+.tz-kpi { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 10px; padding: 0.5rem 0.6rem; text-align: center; }
+.tz-kpi-v { font-family: var(--font-mono); font-size: 1.3rem; font-weight: 700; color: var(--color-fg); line-height: 1.1; }
+.tz-kpi-l { font-size: 0.68rem; color: var(--color-fg-subtle); margin-top: 0.15rem; }
+.tz-kpi-u { font-size: 0.62rem; color: var(--color-fg-faint); }
+
+/* ---- panels + tabs host ---- */
+.tz-panel { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 10px; padding: 0.7rem 0.85rem; }
+.tz-panel-t { font-size: 0.84rem; color: var(--color-fg-subtle); margin-bottom: 0.45rem; font-weight: 600; }
+.tz-panel-sub { font-size: 0.74rem; color: var(--color-fg-faint); margin-bottom: 0.5rem; }
+.uplot-host { width: 100%; }
+
+/* ---- decision / validity card ---- */
+.tz-decision { display: flex; flex-direction: column; gap: 0.4rem; padding: 0.7rem 0.8rem; border: 1px solid var(--color-border); border-radius: 10px; background: var(--color-surface); }
+.tz-decision-h { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-fg-subtle); font-weight: 600; }
+.tz-verdict { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 700; font-size: 0.95rem; }
+.tz-badge { display: inline-block; padding: 0.12rem 0.5rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; border: 1px solid transparent; }
+.tz-badge.ok { background: color-mix(in oklab, #3fb950 22%, transparent); color: #3fb950; border-color: #3fb95066; }
+.tz-badge.warn { background: color-mix(in oklab, #d29922 22%, transparent); color: #d29922; border-color: #d2992266; }
+.tz-badge.bad { background: color-mix(in oklab, #f85149 22%, transparent); color: #f85149; border-color: #f8514966; }
+.tz-flags { margin: 0; padding-left: 1.1rem; font-size: 0.76rem; color: var(--color-fg-subtle); }
+
+/* ---- 3D chamber host + mandatory precomputed banner ---- */
+.tz-canvas-wrap { position: relative; }
+.tz-canvas-wrap canvas { display: block; width: 100%; border-radius: 10px; border: 1px solid var(--color-border); background: var(--color-surface); }
+.tz-precomp-banner { position: absolute; top: 8px; left: 8px; background: color-mix(in oklab, var(--color-surface) 88%, transparent); border: 1px solid var(--color-border); border-radius: 6px; padding: 0.2rem 0.5rem; font-size: 0.68rem; color: var(--color-fg-subtle); pointer-events: none; }
+
+/* ---- generic helpers ---- */
+.tz-note { font-size: 0.76rem; border-left: 3px solid var(--color-warn, #d29922); padding-left: 0.6rem; color: var(--color-fg-subtle); }
+.tz-readout { position: absolute; pointer-events: none; background: color-mix(in oklab, var(--color-surface) 92%, transparent); border: 1px solid var(--color-border); border-radius: 6px; padding: 0.2rem 0.45rem; font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-fg); white-space: nowrap; }
+.tz-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.tz-table th, .tz-table td { text-align: left; padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--color-border); }
+.tz-table td.num, .tz-table th.num { text-align: right; font-family: var(--font-mono); }
+.tz-svg-wrap { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 10px; padding: 0.6rem; }
+.tz-svg-wrap svg { display: block; width: 100%; height: auto; }
+.tz-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+@media (max-width: 760px) { .tz-grid2 { grid-template-columns: 1fr; } }
+.tz-prose { max-width: 70ch; line-height: 1.6; }
+.tz-prose h3 { margin-top: 1.4rem; }
+.tz-lead { font-size: 1.02rem; color: var(--color-fg-subtle); line-height: 1.6; }

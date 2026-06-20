@@ -1,0 +1,12 @@
+node_modules
+dist
+.venv
+__pycache__
+*.pyc
+.DS_Store
+# raw offline DEM solver exports — NEVER a web payload (manifest §artifacts)
+tools/**/raw/
+tools/**/*.vtk
+tools/**/*.vtu
+*.local
+.vite
