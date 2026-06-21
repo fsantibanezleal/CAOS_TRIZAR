@@ -9,11 +9,11 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import { evaluate } from '../../src/physics/engine.ts';
+import { evaluate } from '../../../frontend/src/physics/engine.ts';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-// training data is an OFFLINE artifact (the surrogate's labels), NOT a web payload — it stays under tools/, the
-// ONNX models + metrics.json (the web artifacts) go to public/ from the Python trainer.
+// training data is an OFFLINE artifact (the surrogate's labels), NOT a web payload — it stays beside the generator,
+// the ONNX models + metrics.json (the web artifacts) go to data/derived/ from the Python trainer.
 const OUT = HERE;
 mkdirSync(OUT, { recursive: true });
 
